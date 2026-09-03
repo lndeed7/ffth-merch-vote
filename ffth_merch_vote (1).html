@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FFTH 10th Anniversary — Merch Vote</title>
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --panel:#141414;
+    --panel-2:#1c1c1c;
+    --line:#2b2b2b;
+    --text:#f2f0e9;
+    --muted:#9a9a94;
+    --yellow:#ffcc00;
+    --orange:#ff6a1a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',Arial,Helvetica,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .stripe{
+    height:6px;
+    background:repeating-linear-gradient(-45deg,var(--yellow) 0 18px,var(--orange) 18px 36px);
+  }
+  header{
+    padding:28px 20px 20px;
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .eyebrow{
+    color:var(--orange);
+    font-weight:800;
+    font-size:13px;
+    letter-spacing:.04em;
+  }
+  h1{
+    font-size:clamp(28px,5vw,44px);
+    line-height:1.05;
+    margin:6px 0 8px;
+    font-weight:900;
+    font-style:italic;
+    transform:skewX(-4deg);
+    display:inline-block;
+  }
+  .sub{
+    color:var(--muted);
+    max-width:620px;
+    font-size:15px;
+    margin:0 0 18px;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+  }
+  input[type=text]{
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:11px 14px;
+    border-radius:4px;
+    font-size:14px;
+    min-width:220px;
+  }
+  input[type=text]:focus{outline:2px solid var(--yellow);}
+  .badge{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 16px;
+    font-size:13px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .badge .count{color:var(--yellow);font-size:16px;}
+  .tabs{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 20px;
+    display:flex;
+    gap:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .tab{
+    padding:12px 18px;
+    cursor:pointer;
+    color:var(--muted);
+    font-weight:700;
+    font-size:14px;
+    border-bottom:3px solid transparent;
+    user-select:none;
+  }
+  .tab.active{color:var(--text);border-bottom-color:var(--yellow);}
+  main{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    position:relative;
+    transition:border-color .15s;
+  }
+  .shots{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:thin;
+  }
+  .shots img{
+    height:96px;
+    width:auto;
+    flex:none;
+    border-radius:4px;
+    border:1px solid var(--line);
+    object-fit:cover;
+    background:#0d0d0d;
+    cursor:zoom-in;
+  }
+  .shots::-webkit-scrollbar{height:6px;}
+  .shots::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+  .lightbox{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.88);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:30px;
+    cursor:zoom-out;
+  }
+  .lightbox.show{display:flex;}
+  .lightbox img{
+    max-width:min(90vw,900px);
+    max-height:88vh;
+    border-radius:6px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+  }
+  .card.selected{
+    border-color:var(--yellow);
+    box-shadow:0 0 0 1px var(--yellow) inset;
+  }
+  .tagrow{display:flex;gap:6px;flex-wrap:wrap;}
+  .tag{
+    font-size:11px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:3px;
+    background:var(--panel-2);
+    color:var(--muted);
+    border:1px solid var(--line);
+  }
+  .tag.team{color:var(--orange);border-color:#3a2418;}
+  .card h3{
+    margin:0;
+    font-size:16px;
+    font-weight:800;
+    line-height:1.25;
+  }
+  .card p{
+    margin:0;
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.5;
+    flex:1;
+  }
+  .vote-btn{
+    align-self:flex-start;
+    background:none;
+    border:1px solid var(--yellow);
+    color:var(--yellow);
+    font-weight:800;
+    font-size:12px;
+    padding:8px 14px;
+    border-radius:4px;
+    cursor:pointer;
+    letter-spacing:.02em;
+    transition:background .15s,color .15s;
+  }
+  .vote-btn:hover{background:rgba(255,204,0,.08);}
+  .vote-btn.on{background:var(--yellow);color:#0a0a0a;}
+  .vote-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .submit-bar{
+    position:sticky;
+    bottom:0;
+    background:linear-gradient(to top,var(--bg) 70%,transparent);
+    padding:20px 0 10px;
+    display:flex;
+    justify-content:center;
+    gap:12px;
+  }
+  .submit-btn{
+    background:var(--orange);
+    color:#0a0a0a;
+    border:none;
+    font-weight:900;
+    font-size:15px;
+    padding:14px 34px;
+    border-radius:4px;
+    cursor:pointer;
+    font-style:italic;
+    transform:skewX(-4deg);
+  }
+  .submit-btn:disabled{background:var(--line);color:var(--muted);cursor:not-allowed;}
+  .note{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin-top:6px;
+  }
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--yellow);
+    color:#0a0a0a;
+    padding:12px 22px;
+    border-radius:4px;
+    font-weight:800;
+    font-size:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);
+    opacity:0;
+    transition:opacity .25s;
+    pointer-events:none;
+  }
+  .toast.show{opacity:1;}
+  .results-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .rank{
+    font-weight:900;
+    font-style:italic;
+    font-size:20px;
+    color:var(--orange);
+    width:32px;
+    flex:none;
+  }
+  .results-info{flex:1;min-width:0;}
+  .results-info h4{margin:0 0 4px;font-size:15px;font-weight:800;}
+  .bar-track{
+    height:8px;
+    background:var(--panel-2);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--orange),var(--yellow));
+  }
+  .votecount{
+    flex:none;
+    font-weight:800;
+    font-size:15px;
+    min-width:64px;
+    text-align:right;
+  }
+  .empty{color:var(--muted);text-align:center;padding:40px 0;font-size:14px;}
+  .hidden{display:none !important;}
+  @media(max-width:600px){
+    .controls{flex-direction:column;align-items:stretch;}
+    input[type=text]{min-width:0;}
+  }
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+<header>
+  <div class="eyebrow">FFTH · 10TH ANNIVERSARY</div>
+  <h1>Vote your top merch</h1>
+  <p class="sub">Every team pitched an idea for the 10th anniversary lineup. Pick your 5 favorites — the shortlist goes to the merch team.</p>
+  <div class="controls">
+    <input type="text" id="nameInput" placeholder="Your name" autocomplete="off">
+    <div class="badge">Votes used <span class="count" id="voteCount">0</span> / 5</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="vote">Vote</div>
+  <div class="tab" data-tab="results">Results</div>
+</div>
+
+<main>
+  <div id="voteView">
+    <div class="grid" id="ideaGrid"></div>
+    <div class="submit-bar">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <button class="submit-btn" id="submitBtn" disabled>Submit my votes</button>
+        <div class="note" id="statusNote">Enter your name and pick up to 5 ideas.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultsView" class="hidden">
+    <div id="resultsList"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="lightbox" id="lightbox"><img id="lightboxImg" src="" alt=""></div>
+
+<script>
+const IDEAS = [
+  {id:"i01",team:"Noom",title:'"X" Eternal Legacy Collection',type:"Jacket / In-game item",aud:"Player, Staff",desc:"Color-changing jacket and gear tied to a player's rank, Booyah count, and account age — dynamic legacy items for veterans plus starter items for new players.",imgs:8},
+  {id:"i02",team:"Noei",title:"Team Everyday Gear",type:"Office Stationery",aud:"Staff",desc:"Keyboard, mouse, water bottle, backpack, notebook, and GM pins reskinned in Free Fire colors so staff can visibly rep the team day to day.",imgs:8},
+  {id:"i03",team:"Nong Non",title:"Free Fire Stationery Set",type:"Merchandise / Giveaway",aud:"Elementary players",desc:"Pencil case, ruler, wallet, and pen set themed around Free Fire characters — turning school supplies into a status symbol for young players.",imgs:4},
+  {id:"i04",team:"Nong Non & Pim",title:"Free Fire Flavor Gacha",type:"Candy / Giveaway",aud:"All",desc:"A mini vending machine of gold-foiled chocolate coins with mystery flavors, color-coded by rarity, with rare Legendary drops.",imgs:4},
+  {id:"i05",team:"Pim",title:"Free Fire Random Box",type:"Merchandise / Giveaway",aud:"All",desc:"Blind-box mini figures of iconic characters, each with a display base and card, plus rare Secret Boxes with alternate finishes.",imgs:3},
+  {id:"i06",team:"Pim",title:"Free Fire MED KIT",type:"Merchandise (Med Kit theme)",aud:"All",desc:"A tactical hard case of real-life survival essentials — umbrella, bottle, sanitizer, first-aid, power bank — styled after the in-game heal kit.",imgs:3},
+  {id:"i07",team:"Mooham",title:"9 Employee Endless Survival Kit",type:"Merch Set",aud:"Employee",desc:"A nine-item everyday desk kit (thermal bottle, power bank, blue-light glasses, earbuds, and more) marking a nine-year cycle for the team.",imgs:9},
+  {id:"i08",team:"Bright",title:"ROG Phone Collab",type:"Mobile phone & Gadgets",aud:"Player, Staff",desc:"A Kelly-themed ROG phone bundle with device, adapter, cable, and an exclusive gaming finger glove.",imgs:1},
+  {id:"i09",team:"Bright",title:"Phone Case x Free Fire",type:"Mobile case / Snap-on",aud:"Player, Staff",desc:"Free Fire cases and snap-ons across the top phone brands, with possible collabs with Casetify, Rhinoshield, or Moft.",imgs:2},
+  {id:"i10",team:"Bright",title:"Character Football",type:"Football",aud:"Player",desc:"Free Fire character artwork on breeze balls, given away or used as prizes at local school tournaments.",imgs:1},
+  {id:"i11",team:"Artto",title:"Iconic Papercraft",type:"Papercraft",aud:"Players",desc:"Buildable paper models of Free Fire landmarks and items — Broken House, Clock Tower, AK Dragon, gloo wall — free to download or sold in higher quality for KOLs.",imgs:7},
+  {id:"i12",team:"Artto",title:"In-game Costume, Real Life",type:"Figure / Apparel",aud:"Players",desc:"Real-life versions of iconic in-game cosmetics, starting with the Pink Bear slippers and Astral Beast sport leggings.",imgs:4},
+  {id:"i13",team:"Artto",title:"Free Fire Nendoroid",type:"Figure",aud:"Players",desc:"A mix-and-match Nendoroid figure line in the Good Smile Company style, with interchangeable parts across characters.",imgs:3},
+  {id:"i14",team:"Artto",title:"Free Fire Diffuser & Candle",type:"Diffuser",aud:"Players",desc:"Low-cost reed diffusers and candles in scents inspired by in-game locations like Kalahari, Sentosa Island, and Hayato House.",imgs:2},
+  {id:"i15",team:"Artto",title:"Free Fire Inhaler",type:"Inhaler",aud:"Players",desc:"A Thai-style inhaler repackaged in Free Fire branding — low cost, high familiarity, needs a new manufacturing partner.",imgs:2},
+  {id:"i16",team:"Artto",title:"Free Fire Mushroom Bun",type:"Food",aud:"Players",desc:"A real-life edible take on the game's classic mushroom pickup, in the spirit of other games' viral in-game-to-real-life food tie-ins.",imgs:7},
+  {id:"i17",team:"Artto",title:"Staff Jersey with Velcro Badges",type:"Jersey",aud:"Staff, Players",desc:"A higher-quality staff jersey with name, customized zipper, and a velcro patch area for team, tenure, region, and rank badges.",imgs:5},
+  {id:"i18",team:"Artto",title:"In-game + Real-life Jersey",type:"Jersey",aud:"Players",desc:"A matching in-game and real-life jersey in a 10th anniversary colorway, with player name display both in and out of game.",imgs:1},
+  {id:"i19",team:"Artto",title:"Free Fire Dog Tag",type:"Accessory",aud:"Players",desc:"A personalized silver dog tag or FF-logo pendant that can display a player's in-game info at a pop-up verification kiosk.",imgs:2},
+  {id:"i20",team:"Artto",title:"Gloo Wall Keychain",type:"Keychain",aud:"Players",desc:"A gloo-wall-shaped keychain — the same personalization idea as the dog tag, but built around a more recognizable Free Fire icon.",imgs:2},
+  {id:"i21",team:"Artto",title:"Traditional Costume Keychain",type:"Character Keychain",aud:"Players",desc:"Character keychains in regional traditional dress, tying into new map content with local cultural elements.",imgs:3},
+  {id:"i22",team:"Artto",title:"Free Fire Desk Setup",type:"Office Stationery",aud:"Staff, Players",desc:"Mousepad, keycaps, drink coaster, powerbank, mug, pen, mouse, and keyboard, all in Free Fire branding for the office desk.",imgs:5},
+  {id:"i23",team:"Artto",title:"Free Fire x M&G School Stationery",type:"School Stationery",aud:"Players",desc:"A pen and stationery line building on an existing successful license with M&G, extendable as a CSR giveaway for schools in need.",imgs:3},
+  {id:"i24",team:"Mo",title:"10th Anniversary Lifestyle Set",type:"Merch Set",aud:"Staff, Player",desc:"An everyday lifestyle collection — suitcase, earbuds, gaming chair, varsity jacket, and bedding — designed to suit all ages and genders.",imgs:5},
+  {id:"i25",team:"Earth",title:"Songkran Water Gun",type:"Water Gun",aud:"KOL & Community",desc:"A free Songkran giveaway water gun in either a gun-skin or backpack format, built to generate UGC during the water festival.",imgs:4},
+  {id:"i26",team:"Earth",title:"Real Model Evo Gun Skin",type:"Real Model Prop",aud:"KOL & Player",desc:"High-quality real-scale replicas of in-game Evo gun skins for offline event photo displays, with keychain and box-set spin-offs.",imgs:5},
+  {id:"i27",team:"Earth",title:"Global Creator Trophy",type:"Trophy",aud:"KOL",desc:"A YouTube-style milestone trophy given to top creators for pride and recognition on a global stage.",imgs:3},
+  {id:"i28",team:"Earth",title:"Free Fire x Top Brand Apparel",type:"Apparel Collab",aud:"KOL",desc:"A barter-deal apparel collab with a major streetwear or sportswear brand, following the model of other esports x fashion tie-ups.",imgs:6},
+  {id:"i29",team:"Earth",title:"Free Fire Lightstick",type:"Lightstick",aud:"KOL & Player",desc:"A concert-style official lightstick for esports events, built around gloo wall, Evo Gun, or character motifs.",imgs:5},
+  {id:"i30",team:"Folk",title:"Smart Stats Display",type:"Smart LED Display",aud:"Major KOL, Top spender/rank",desc:"A Divoom-style smart display that syncs and shows off a player's profile, account age, prime level, and rank in real time.",imgs:10},
+  {id:"i31",team:"Esther",title:"Staff Gaming Peripherals Box",type:"Office supplies",aud:"Employee",desc:"A Free Fire branded headset and keyboard box set for staff who work at a PC all day.",imgs:2},
+  {id:"i32",team:"Esther",title:"Staff Desk & Wardrobe Set",type:"Office supplies",aud:"Employee",desc:"Printed napkins, a color-changing stats mug, and a wearable GM jacket for staff to represent Free Fire around the office.",imgs:4}
+];
+
+function shotsHTML(idea){
+  let out = '<div class="shots">';
+  for(let i=1;i<=idea.imgs;i++){
+    out += `<img src="${idea.id}_${i}.jpg" alt="${idea.title} reference ${i}" loading="lazy">`;
+  }
+  out += '</div>';
+  return out;
+}
+
+const MAX_VOTES = 5;
+let selected = new Set();
+let currentName = "";
+
+const grid = document.getElementById('ideaGrid');
+const nameInput = document.getElementById('nameInput');
+const voteCountEl = document.getElementById('voteCount');
+const submitBtn = document.getElementById('submitBtn');
+const statusNote = document.getElementById('statusNote');
+const toast = document.getElementById('toast');
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 2200);
+}
+
+function renderCards(){
+  grid.innerHTML = IDEAS.map(idea => `
+    <div class="card ${selected.has(idea.id) ? 'selected' : ''}" data-id="${idea.id}">
+      <div class="tagrow">
+        <span class="tag team">${idea.team}</span>
+        <span class="tag">${idea.type}</span>
+      </div>
+      <h3>${idea.title}</h3>
+      ${shotsHTML(idea)}
+      <p>${idea.desc}<br><span style="color:var(--muted);opacity:.7;">For: ${idea.aud}</span></p>
+      <button class="vote-btn ${selected.has(idea.id) ? 'on' : ''}" data-id="${idea.id}">
+        ${selected.has(idea.id) ? '✓ Selected' : 'Vote'}
+      </button>
+    </div>
+  `).join('');
+  updateButtonStates();
+}
+
+function updateButtonStates(){
+  voteCountEl.textContent = selected.size;
+  document.querySelectorAll('.vote-btn').forEach(btn=>{
+    const id = btn.dataset.id;
+    const isOn = selected.has(id);
+    btn.classList.toggle('on', isOn);
+    btn.textContent = isOn ? '✓ Selected' : 'Vote';
+    btn.disabled = !isOn && selected.size >= MAX_VOTES;
+    btn.closest('.card').classList.toggle('selected', isOn);
+  });
+  refreshSubmitState();
+}
+
+function refreshSubmitState(){
+  const name = nameInput.value.trim();
+  currentName = name;
+  const ok = name.length > 0 && selected.size > 0 && selected.size <= MAX_VOTES;
+  submitBtn.disabled = !ok;
+  if(!name){
+    statusNote.textContent = "Enter your name to submit your votes.";
+  } else if(selected.size === 0){
+    statusNote.textContent = "Pick at least 1 idea (up to 5).";
+  } else {
+    statusNote.textContent = `Ready to submit ${selected.size} vote${selected.size>1?'s':''} as "${name}".`;
+  }
+}
+
+grid.addEventListener('click', (e)=>{
+  const shot = e.target.closest('.shots img');
+  if(shot){
+    lightboxImg.src = shot.src;
+    lightboxImg.alt = shot.alt;
+    lightbox.classList.add('show');
+    return;
+  }
+  const btn = e.target.closest('.vote-btn');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  if(selected.has(id)){
+    selected.delete(id);
+  } else if(selected.size < MAX_VOTES){
+    selected.add(id);
+  }
+  updateButtonStates();
+});
+
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+lightbox.addEventListener('click', ()=> lightbox.classList.remove('show'));
+
+nameInput.addEventListener('input', refreshSubmitState);
+
+submitBtn.addEventListener('click', async ()=>{
+  const name = nameInput.value.trim();
+  if(!name || selected.size === 0) return;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+  try{
+    const key = 'votes:' + name.toLowerCase().replace(/\s+/g,'_');
+    await window.storage.set(key, JSON.stringify({name, ideaIds:[...selected], ts:Date.now()}), true);
+    showToast("Votes submitted — thank you!");
+    statusNote.textContent = `Submitted ${selected.size} vote${selected.size>1?'s':''} as "${name}". You can change your mind and resubmit anytime.`;
+    await loadResults();
+  } catch(err){
+    showToast("Something went wrong — try again.");
+    console.error(err);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit my votes";
+    refreshSubmitState();
+  }
+});
+
+// ---- Results ----
+const resultsList = document.getElementById('resultsList');
+
+async function loadResults(){
+  resultsList.innerHTML = '<div class="empty">Loading results…</div>';
+  try{
+    const listing = await window.storage.list('votes:', true);
+    const keys = (listing && listing.keys) ? listing.keys : [];
+    const tally = {};
+    IDEAS.forEach(i => tally[i.id] = 0);
+    let totalVoters = 0;
+
+    for(const k of keys){
+      try{
+        const rec = await window.storage.get(k, true);
+        if(!rec || !rec.value) continue;
+        const data = JSON.parse(rec.value);
+        totalVoters++;
+        (data.ideaIds || []).forEach(id => {
+          if(tally[id] !== undefined) tally[id]++;
+        });
+      } catch(e){ /* skip bad record */ }
+    }
+
+    const ranked = IDEAS
+      .map(idea => ({idea, votes: tally[idea.id]}))
+      .sort((a,b)=> b.votes - a.votes);
+
+    const maxVotes = Math.max(1, ranked[0]?.votes || 0);
+
+    if(totalVoters === 0){
+      resultsList.innerHTML = '<div class="empty">No votes yet — be the first to vote!</div>';
+      return;
+    }
+
+    resultsList.innerHTML =
+      `<div class="note" style="margin-bottom:16px;">${totalVoters} staff member${totalVoters>1?'s':''} voted so far</div>` +
+      ranked.map((r, idx) => `
+        <div class="results-row">
+          <div class="rank">${idx+1}</div>
+          <div class="results-info">
+            <h4>${r.idea.title} <span style="color:var(--muted);font-weight:600;font-size:12px;">— ${r.idea.team}</span></h4>
+            <div class="bar-track"><div class="bar-fill" style="width:${(r.votes/maxVotes*100)}%"></div></div>
+          </div>
+          <div class="votecount">${r.votes} vote${r.votes!==1?'s':''}</div>
+        </div>
+      `).join('');
+  } catch(err){
+    resultsList.innerHTML = '<div class="empty">Could not load results. Try again shortly.</div>';
+    console.error(err);
+  }
+}
+
+// ---- Tabs ----
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.getElementById('voteView').classList.toggle('hidden', target !== 'vote');
+    document.getElementById('resultsView').classList.toggle('hidden', target !== 'results');
+    if(target === 'results') loadResults();
+  });
+});
+
+renderCards();
+</script>
+</body>
+</html>
